@@ -2,7 +2,7 @@ require('dotenv').config()
 const axios = require('axios')
 const ethers = require('ethers')
 
-console.log(`Initiating oracle with provider ${process.env.PROVIDER_RPC_URL} and address ${process.env.ORACLE_ADDRESS}`)
+console.log(`[Start] Oracle with provider ${process.env.PROVIDER_RPC_URL} and address ${process.env.ORACLE_ADDRESS}`)
 
 const provider = new ethers.providers.JsonRpcProvider(process.env.PROVIDER_RPC_URL)
 const oracleAddress = process.env.ORACLE_ADDRESS
@@ -23,22 +23,22 @@ const callbackAbi = [
 ]
 
 const invokeUrlWithCallback = async ({ callbackAddress, url, responseKey }) => {
-    console.log(`invokeUrlWithCallback ${callbackAddress} ${url} ${responseKey}`)
+    console.log(`[API Request Started] Destination: ${callbackAddress} URL: ${url} Response Key: ${responseKey}`)
     const response = await axios.get(url)
     const data = response?.data
     const value = data[responseKey]
-    console.log(`-----------------------> ${value} <--------------------------`)
+    console.log(`[API Response Received]] ${value}`)
 
     const relayerWallet = new ethers.Wallet(process.env.RELAYER_PRIVATE_KEY, provider)
     const callbackContract = new ethers.Contract(callbackAddress, callbackAbi, relayerWallet)
     try {
         const callbackTransaction = await callbackContract.onCallbackHTTPGet(value)
-        console.log('Callback Transaction Complete')
-        console.log(callbackTransaction)
+        // console.log('Callback Transaction Complete')
+        // console.log(callbackTransaction)
     } catch (e) {
-        console.log(e)
+        // console.log(e)
     } finally {
-        console.log(`Sync finalized`)
+        console.log(`[API Request Ended]`)
     }
 }
 
@@ -48,17 +48,17 @@ const fetch = async () => {
         const data = await provider.getBlockWithTransactions(blockNumber-1)
         const transactions = data?.transactions
         const oracleTxs = transactions?.filter((tx) => {
-            console.log(tx)
+            // console.log(tx)
             const oracle = oracleAddress.toLowerCase()
             const target = tx.to.toLowerCase()
             const dataContainsOracle = tx?.data?.includes(oracleAddress.toLowerCase().replace('0x', ''))
             const isMatch = target === oracle || dataContainsOracle
-            console.log(`New inbound transaction for ${target}, oracle address is ${oracle}, is match ${isMatch} or data contains oracle ref ${dataContainsOracle}`)
-            console.log(tx)
+            // console.log(`New inbound transaction for ${target}, oracle address is ${oracle}, is match ${isMatch} or data contains oracle ref ${dataContainsOracle}`)
+            // console.log(tx)
             return isMatch
         });
         // Oracle events?
-        console.log(`Scanning oracle block ${blockNumber-1} total transactions ${transactions?.length} oracle transactions ${oracleTxs.length}`)
+        console.log(`[Scanning] Oracle transactions at block ${blockNumber-1} found: ${oracleTxs.length}`)
         if (oracleTxs.length > 0) {
             oracleTxs.forEach(async(tx) => {
                 const receipt = await tx.wait()
@@ -72,6 +72,7 @@ const fetch = async () => {
                  *  'price'
                  * ]
                  */
+                console.log(`[Received Event] properties:`)
                 console.log(decodedData)
                 const value = await invokeUrlWithCallback({
                     callbackAddress: decodedData[0],
