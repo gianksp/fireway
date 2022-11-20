@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Fireway",
+  "name": "Fireway is a cross-chain data oracle micro framework connecting real-world data and APIs to smart contracts.",
   "icons": [
     {
       "src": "favicon.ico",
