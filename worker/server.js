@@ -2,7 +2,10 @@ require('dotenv').config()
 const axios = require('axios')
 const ethers = require('ethers')
 
-console.log(`[Start] Oracle with provider ${process.env.PROVIDER_RPC_URL} and address ${process.env.ORACLE_ADDRESS}`)
+// Temporarily keep track of transationHashes processed. WIP
+const processedMap = new Map();
+
+console.log(`[Start] Listening oracle with provider ${process.env.PROVIDER_RPC_URL} and address ${process.env.ORACLE_ADDRESS}`)
 
 const provider = new ethers.providers.JsonRpcProvider(process.env.PROVIDER_RPC_URL)
 const oracleAddress = process.env.ORACLE_ADDRESS
@@ -48,7 +51,6 @@ const fetch = async () => {
         const data = await provider.getBlockWithTransactions(blockNumber-1)
         const transactions = data?.transactions
         const oracleTxs = transactions?.filter((tx) => {
-            // console.log(tx)
             const oracle = oracleAddress.toLowerCase()
             const target = tx.to.toLowerCase()
             const dataContainsOracle = tx?.data?.includes(oracleAddress.toLowerCase().replace('0x', ''))
@@ -63,22 +65,30 @@ const fetch = async () => {
             oracleTxs.forEach(async(tx) => {
                 const receipt = await tx.wait()
                 const events = receipt?.logs
-                const decodedData = ethers.utils.defaultAbiCoder.decode([ 'address', 'string', 'string' ], events[0].data)
-                /**
-                 * e.g Event format
-                 * [
-                 *  '0x2265BfE8b1baBB71aeDa3A8e37af4015dF6B8f73',
-                 *  'https://api.binance.com/api/v3/ticker/price?symbol=FILUSDT',
-                 *  'price'
-                 * ]
-                 */
-                console.log(`[Received Event] properties:`)
-                console.log(decodedData)
-                const value = await invokeUrlWithCallback({
-                    callbackAddress: decodedData[0],
-                    url: decodedData[1],
-                    responseKey: decodedData[2]
-                })
+                const transactionHash = receipt.transactionHash;
+                if (processedMap.get(transactionHash)) {
+                    // Do nothing
+                    console.log(`[Received Event] Already processed txHash: ${transactionHash}, doing nothing`)
+                } else {
+                    // Mark as processed
+                    processedMap.set(transactionHash, true)
+                    const decodedData = ethers.utils.defaultAbiCoder.decode([ 'address', 'string', 'string' ], events[0].data)
+                    /**
+                     * e.g Event format
+                     * [
+                     *  '0x2265BfE8b1baBB71aeDa3A8e37af4015dF6B8f73',
+                     *  'https://api.binance.com/api/v3/ticker/price?symbol=FILUSDT',
+                     *  'price'
+                     * ]
+                     */
+                    console.log(`[Received Event] processing txHash: ${transactionHash} with properties:`)
+                    console.log(decodedData)
+                    const value = await invokeUrlWithCallback({
+                        callbackAddress: decodedData[0],
+                        url: decodedData[1],
+                        responseKey: decodedData[2]
+                    })
+                }
             })
         }
     } catch (e) {
