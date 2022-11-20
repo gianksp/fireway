@@ -61,11 +61,11 @@ const Hero = ({
         <div className={innerClasses}>
           <div className="hero-content">
             <h1 className="mt-0 mb-16 reveal-from-bottom" data-reveal-delay="200">
-              Minimalistic Oracle <span className="text-color-primary">Framework</span>
+              Open Source Oracle <span className="text-color-primary">Framework</span>
             </h1>
             <div className="container-xs">
               <p className="m-0 mb-32 reveal-from-bottom" data-reveal-delay="400">
-                Fireway is a minimalistic, cross-chain data oracle framework connecting real-world data and APIs to smart contracts.
+                Fireway is a cross-chain data oracle micro framework connecting real-world data and APIs to smart contracts.
                 </p>
               <div className="reveal-from-bottom" data-reveal-delay="600">
                 <ButtonGroup>
