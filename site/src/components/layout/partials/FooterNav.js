@@ -19,16 +19,16 @@ const FooterNav = ({
     >
       <ul className="list-reset">
         <li>
-          <Link to="#0">Contact</Link>
+          <Link to="https://twitter.com/gianksp">Contact</Link>
         </li>
         <li>
-          <Link to="#0">About us</Link>
+          <Link to="https://www.linkedin.com/in/gianksp/">About me</Link>
         </li>
         <li>
-          <Link to="#0">FAQ's</Link>
+          <Link to="https://github.com/gianksp/fireway">FAQ's</Link>
         </li>
         <li>
-          <Link to="#0">Support</Link>
+          <Link to="https://discord.gg/CYYX8yUVgc">Support</Link>
         </li>
       </ul>
     </nav>
