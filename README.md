@@ -41,10 +41,10 @@ function onCallbackHTTPGet(string calldata response)
 Fireway uses a number of projects to work properly:
 
 - [ReactJS](https://reactjs.org/) - For the landing page
-- [Remix IDE](https://reactjs.org/) - As Solidity smart contract IDE
-- [EtherJS](https://reactjs.org/) - Markdown parser done right. Fast and easy to extend.
-- [Docker](https://reactjs.org/) - great UI boilerplate for modern web apps
-- [Filecoin EVM](https://reactjs.org/) - evented I/O for the backend
+- [Remix IDE](https://remix.ethereum.org/) - As Solidity smart contract IDE
+- [EtherJS](https://docs.ethers.io/v5/) - To interact with smart contracts from worker.
+- [Docker](https://www.docker.com/) - Contenerized worker solution
+- [Filecoin EVM](https://fvm.filecoin.io/) - Where this project was first launched and demoed
 
 ## Installation
 
